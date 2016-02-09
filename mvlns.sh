@@ -2,9 +2,10 @@
 ##
 # A simple bash script to move a file into a new directory and create a symbolic
 # link from its original location to its new location
+# TODO: Make this accept optional conflict callback
 mvlns() {
-  local file_origin=$1
-  local file_destination=$2
+  local file_origin="$1"
+  local file_destination="$2"
 
   mv --no-clobber -- "$file_origin" "$file_destination" || exit 1
   if [[ -d $file_destination ]]; then
