@@ -10,23 +10,17 @@
 ln_safe() {
   local origin=$1
   local destination=$2
+  local callback=$3
 
-  # TODO: Write a more helpful error message. Also find a more elegant way for
-  # error handling here
   [[ -e "$origin" ]] || exit 1
 
-  if [[ $# -eq 2 ]]; then
-    ln --symbolic -- "$origin" "$destination" || exit 1
-    exit 0
-  elif [[ $# -ne 3 ]]; then
+  if [[ $# -ne 3 ]]; then
     # FIXME: heredoc this
     echo "Invalid number of arguments. Accepts two arguments and an optional callback" >&2
+    exit 1
   fi
 
-  if [[ -e "$destination" ]]; then
-    # TODO: Write this to call ln -s on success and print error on fail.
-    $3 "$destination" "$origin"
-  fi
+  "$callback" "$destination" "$origin"
 }
 
 # This is the kind of code that would go in a callback, probably?
