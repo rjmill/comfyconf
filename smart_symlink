@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+##
+# Check if a given command exists, and make a symlink if it does
+#
+# Usage: smart_symlink COMMAND TARGET LINK_NAME
+
+##
+# Print the usage of this script to standard out
+show_usage() {
+	# TODO: how do I do this to standard error?
+	cat <<- EOF
+		Usage: script PROGRAM TARGET LINK_NAME
+	EOF
+}
+
+##
+# check if a command exists
+command_exists() {
+	if [[ "$#" -ne 1 ]]; then
+		>&2 echo "Usage: command_exists COMMAND"
+		exit 1
+	fi
+
+  local cmd="$1"
+	
+	type "$cmd"
+	if [[ "$?" -ne 0 ]]; then
+		>&2 echo "Command $1 does not exist!"
+		exit 1
+	fi
+	exit 0
+}
+
+main() {
+	if [[ "$#" -ne 3 ]]; then
+		show_usage
+		exit 1
+	fi
+
+	local dependent_command="$1"
+	local target_file="$2"
+	local link_destination="$3"
+
+	if [[ $(command_exists "$dependent_command") ]]; then
+		echo "$dependent_command exists. Attempting to create symlink to $target_file at $link_destination"
+
+		ln --symbolic -- "$target_file" "$link_destination"
+		if [[ "$?" -ne 0 ]]; then
+			>&2 echo "Symlink creation failed."
+			exit 1
+		else
+			echo "Symlink creation successful."
+		fi
+	else
+		>&2 echo "$dependent_command does not exist. No symlink will be created"
+		exit 1
+	fi
+}
+
+main "$@"
